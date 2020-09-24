@@ -11,6 +11,24 @@
         android:text="@string/move_right"
         android:id="@+id/moveRight"/>
 
+    <Button
+        android:id="@+id/moveLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/move_left" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/move_up"
+        android:id="@+id/moveUp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/move_down"
+        android:id="@+id/moveDown"/>
+
     <TextView
         android:id="@+id/pointsView"
         android:textSize="24sp"
