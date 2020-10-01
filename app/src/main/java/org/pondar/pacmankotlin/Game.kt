@@ -20,13 +20,20 @@ class Game(private var context: Context,view: TextView) {
         var pacBitmap: Bitmap
         var pacx: Int = 0
         var pacy: Int = 0
+        ///////////////////////LOU adding golcoins bitmap
+        var golBitmap: Bitmap
+
 
 
         //did we initialize the coins?
         var coinsInitialized = false
 
         //the list of goldcoins - initially empty
-        var coins = ArrayList<GoldCoin>()
+        var coins = ArrayList<GoldCoin>() //creating an empty arraylist
+
+
+
+
         //a reference to the gameview
         private var gameView: GameView? = null
         private var h: Int = 0
@@ -35,17 +42,33 @@ class Game(private var context: Context,view: TextView) {
 
     init {
         pacBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.pacman)
-
+    }
+    ////////////////////LOU trying to add drawable to
+    init {
+        golBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.rsz_coin)
     }
 
     fun setGameView(view: GameView) {
         this.gameView = view
     }
 
+    ////////////////LOU added var taken
+
     //TODO initialize goldcoins also here
     fun initializeGoldcoins()
     {
         //DO Stuff to initialize the array list with coins.
+        ///////////LOU adding coins
+        coins.add (GoldCoin(false,10,10))
+        coins.add (GoldCoin(false, 10, 400))
+        coins.add (GoldCoin(false, 10,1100))
+        coins.add (GoldCoin(false, 400, 1000))
+        coins.add (GoldCoin(false, 400,10))
+        coins.add (GoldCoin(false, 400,650))
+        coins.add (GoldCoin(false, 900,10))
+        coins.add (GoldCoin(false, 1100, 1500))
+        coins.add (GoldCoin(false, 50,1500))
+        coins.add (GoldCoin(false, 400,1500))
 
         coinsInitialized = true
     }
@@ -76,7 +99,7 @@ class Game(private var context: Context,view: TextView) {
 
     fun movePacmanLeft(pixels: Int) {
         //still within our boundaries?
-        if (pacx - pixels > 20) {
+        if (pacx - pixels > 0) {
             pacx = pacx - pixels
             doCollisionCheck()
             gameView!!.invalidate()

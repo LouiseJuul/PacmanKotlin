@@ -54,10 +54,20 @@ class GameView : View {
         canvas.drawBitmap(game!!.pacBitmap, game?.pacx!!.toFloat(),
                 game?.pacy!!.toFloat(), paint)
 
+
         //TODO loop through the list of goldcoins and draw them.
+        ///////LOU draw loop through goldcoin
+        ///////LOU The for/in statement loops through the properties of an object
+        for (coin in game!!.coins)
+           {
+               Log.d("you have printed", "$coin")
+               canvas.drawBitmap(game!!.golBitmap, coin?.golx.toFloat(), coin?.goly.toFloat(), paint)
+           }
 
         game?.doCollisionCheck()
         super.onDraw(canvas)
+
+
     }
 
 }
