@@ -64,6 +64,7 @@ class GameView : View {
                canvas.drawBitmap(game!!.golBitmap, coin?.golx.toFloat(), coin?.goly.toFloat(), paint)
            }
 
+        
         game?.doCollisionCheck()
         super.onDraw(canvas)
 
