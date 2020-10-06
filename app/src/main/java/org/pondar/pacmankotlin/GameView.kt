@@ -1,6 +1,7 @@
 package org.pondar.pacmankotlin
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -27,7 +28,6 @@ class GameView : View {
     constructor(context: Context) : super(context)
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-
 
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
@@ -58,13 +58,14 @@ class GameView : View {
         //TODO loop through the list of goldcoins and draw them.
         ///////LOU draw loop through goldcoin
         ///////LOU The for/in statement loops through the properties of an object
-        for (coin in game!!.coins)
-           {
-               Log.d("you have printed", "$coin")
-               canvas.drawBitmap(game!!.golBitmap, coin?.golx.toFloat(), coin?.goly.toFloat(), paint)
-           }
+        for (coin in game!!.coins) {
+            if (coin.taken == false) {
+                Log.d("you have printed", "$coin")
+                canvas.drawBitmap(game!!.golBitmap, coin?.golx.toFloat(), coin?.goly.toFloat(), paint)
+            }
+        }
 
-        
+
         game?.doCollisionCheck()
         super.onDraw(canvas)
 
