@@ -15,45 +15,33 @@ import java.util.*
  * This class should contain all your game logic
  */
 
-open class Game(private var context: Context,view: TextView) {
-
-
-    //bitmap of the pacman
-    var pacBitmap: Bitmap
-    var pacx: Int = 0
-    var pacy: Int = 0
-    var direction = 0
-    var counter : Int = 0
-    var timer: Int = 60
-    var Timer: Timer = Timer()
-    //you should put the running in the game class
-    private var running: Boolean = false
-
+open class Game(private var context: Context, view: TextView) {
     private var pointsView: TextView = view
     private var points: Int = 0
 
+    var pacBitmap: Bitmap //pacman bitmap
+    var enemyBitmap: Bitmap //enemy bitmap
+    var golBitmap: Bitmap //golcoins bitmap
+    var pacx: Int = 0
+    var pacy: Int = 0
+    var enemyx: Int = 400
+    var enemyy: Int = 0
+    var enemyAlive = true
+    var direction = 0
+    var directionEnemy = 1
+    var counter: Int = 0
+    var timer: Int = 60
+    var running: Boolean = false
 
-    ///golcoins bitmap
-    var golBitmap: Bitmap
+    var coinsInitialized = false  //did we initialize the coins?
+    var enemiesInitialized = false
 
-    ///////LOU direction variable
-    var directionUp: Int = 1
-    var directionDown: Int = 2
-    var directionLeft: Int = 3
-    var directionRight:Int = 4
+    var coins = ArrayList<GoldCoin>()//arraylist of goldcoins
+    var enemies = ArrayList<Enemy>() //arraylist of enymies
 
-    //did we initialize the coins?
-    var coinsInitialized = false
-
-    //the list of goldcoins - initially empty
-    var coins = ArrayList<GoldCoin>() //creating an empty arraylist
-
-
-    //a reference to the gameview
-    private var gameView: GameView? = null
+    private var gameView: GameView? = null //reference to the gameview
     private var h: Int = 0
     private var w: Int = 0 //height and width of screen
-
 
     init {
         pacBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.pacman)
@@ -63,14 +51,26 @@ open class Game(private var context: Context,view: TextView) {
         golBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.rsz_coin)
     }
 
+    init {
+        enemyBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.gost)
+    }
+
     fun setGameView(view: GameView) {
         this.gameView = view
     }
 
-    //TODO initialize goldcoins also here
+    fun initializeEnemy() {
+        enemies.add(Enemy(false, true, 900, 900))
+        enemiesInitialized = true
+        //genbrug timer fra pacman og gost (genbrug)
+        //direction - bevæg gost
+        //op ned højre venstre
+        // læg den i samme timer
+        //langsommere flytter mindre antal pixels
+    }
+
+    //initialize the arrylist of goldcoins and add coins
     fun initializeGoldcoins() {
-        //initialize the array list with coins.
-        ///add coins
         coins.add(GoldCoin(false, 10, 10))
         coins.add(GoldCoin(false, 10, 900))
         coins.add(GoldCoin(false, 10, 1400))
@@ -79,29 +79,31 @@ open class Game(private var context: Context,view: TextView) {
         coins.add(GoldCoin(false, 450, 900))
         coins.add(GoldCoin(false, 450, 1400))
         coins.add(GoldCoin(false, 900, 10))
-        coins.add(GoldCoin(false, 900, 900))
+        coins.add(GoldCoin(false, 900, 450))
         coins.add(GoldCoin(false, 900, 1400))
         coinsInitialized = true
     }
 
+
     fun newGame() {
-        pacx = 50
+        running = false
+        pacx = 50 //starting coordinates
         pacy = 400 //starting coordinates
-        timer = 60
-        counter = 0
-        //reset the points
+        timer = 30
+      //  counter = 0
         coinsInitialized = false
-        points = 0
+        enemiesInitialized = false
+        points = 0 //reset the points
         pointsView.text = "${context.resources.getString(R.string.points)} $points"
-        //timer.text = getString(R.string.timer,counter)
         gameView?.invalidate() //redraw screen
     }
 
-    fun gameOver(){
-        if (timer===0)
-        {
-            Toast.makeText(context, "You loose", Toast.LENGTH_LONG).show()
-            Log.d("dead",timer.toString())
+     fun gameOver() {
+        if (timer == 1) {
+            timer = 0
+            running = false
+            counter = 0
+            Toast.makeText(context, "Time is up, you loose", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -150,49 +152,85 @@ open class Game(private var context: Context,view: TextView) {
         }
     }
 
-    fun distance(pacx: Int, pacy: Int, golx: Int, goly: Int): Double {
+    //Move enemy
+    fun moveEnemy(pixels: Int) {
+        //still within our boundaries?
+        if (directionEnemy == 2) { //direction is down
+            if (enemyy + pixels + enemyBitmap.height < h) {
+                enemyy = enemyy + pixels
+                directionEnemy = 2
+            } else {
+                directionEnemy = 1
+            }
 
-        // calculate distance and return it
-        var cordinatation = (sqrt(((pacx - golx) * (pacx - golx) + (pacy - goly) * (pacy - goly)).toDouble()))
+        } else { // direction is up
+            if (enemyy - pixels > 0) {
+                enemyy = enemyy - pixels
+                directionEnemy = 1
+            } else {
 
-        return cordinatation;
-    }
-
-
-    /*
-
-    fun win(){
-        if (points ===10){
-         timer(conter??) =< 60
-         running = false
+                directionEnemy = 2
+            }
         }
     }
-    */
 
 
 
-    //TODO check if the pacman touches a gold coin
-    //and if yes, then update the neccesseary data
-    //for the gold coins and the points
-    //so you need to go through the arraylist of goldcoins and
-    //check each of them for a collision with the pacman
-    fun doCollisionCheck() {
-        coins.forEach {
-            if (distance(pacx, pacy, it.golx, it.goly) < 220) {
-                if (it.taken===false){
-                    points++
-                    it.taken=true
-                    pointsView.text = "${context.resources.getString(R.string.points)} $points"
+fun distance(pacx: Int, pacy: Int, golx: Int, goly: Int): Double {
+
+    // calculate distance and return it
+    var cordinatation = (sqrt(((pacx - golx) * (pacx - golx) + (pacy - goly) * (pacy - goly)).toDouble()))
+
+    return cordinatation;
+}
+
+fun distanceEnemy(pacx: Int, pacy: Int, enemyx: Int, enemyy: Int): Double {
+
+    // calculate distance and return it
+    var cordinatation = (sqrt(((pacx - enemyx) * (pacx - enemyx) + (pacy - enemyy) * (pacy - enemyy)).toDouble()))
+
+    return cordinatation;
+}
+
+
+//TODO check if the pacman touches a gold coin
+//and if yes, then update the neccesseary data
+//for the gold coins and the points
+//so you need to go through the arraylist of goldcoins and
+//check each of them for a collision with the pacman
+fun doCollisionCheck() {
+
+    enemies.forEach {
+        if (distanceEnemy(pacx, pacy, enemyx, enemyy) < 200) {
+            running = false
+            Toast.makeText(context, "You died", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+    coins.forEach {
+        if (distance(pacx, pacy, it.golx, it.goly) < 220) {
+            if (it.taken == false) {
+                it.taken = true
+                points++
+                pointsView.text = "${context.resources.getString(R.string.points)} $points"
+
+          /*
+            } else {
+                    points == 0
                 }
 
+           */
+
                 //check if all 10 goldcoins are collected = win
-                if (points ===10) {
-                    Toast.makeText(context, "You won the game", Toast.LENGTH_LONG).show()
-                    newGame()
+                if (points === 10) {
+                    running = false
+                    Toast.makeText(context, "You won the game", Toast.LENGTH_SHORT).show()
                 }
 
                 Log.d("points", points.toString())
             }
         }
     }
+}
 }

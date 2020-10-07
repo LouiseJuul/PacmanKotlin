@@ -41,9 +41,12 @@ class GameView : View {
         game?.setSize(h, w)
         Log.d("GAMEVIEW", "h = $h, w = $w")
 
-        //are the coins initiazlied?
+        //if coins are not initiazlied
         if (!(game!!.coinsInitialized))
             game?.initializeGoldcoins()
+
+        if (!(game!!.enemiesInitialized))
+            game?.initializeEnemy()
 
 
         //Making a new paint object
@@ -54,10 +57,12 @@ class GameView : View {
         canvas.drawBitmap(game!!.pacBitmap, game?.pacx!!.toFloat(),
                 game?.pacy!!.toFloat(), paint)
 
+        canvas.drawBitmap(game!!.enemyBitmap, game?.enemyx!!.toFloat(),
+                game?.enemyy!!.toFloat(), paint)
 
-        //TODO loop through the list of goldcoins and draw them.
-        ///////LOU draw loop through goldcoin
-        ///////LOU The for/in statement loops through the properties of an object
+
+        //Loop through list of goldcoins and draw them
+        //The for/in statement loops through the properties of an object
         for (coin in game!!.coins) {
             if (coin.taken == false) {
                 Log.d("you have printed", "$coin")
@@ -68,8 +73,5 @@ class GameView : View {
 
         game?.doCollisionCheck()
         super.onDraw(canvas)
-
-
     }
-
 }
