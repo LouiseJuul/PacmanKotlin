@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 
 
+
 //note we now create our own view class that extends the built-in View class
 class GameView : View {
 
