@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.View
 
 
-
 //note we now create our own view class that extends the built-in View class
 class GameView : View {
 
@@ -46,6 +45,7 @@ class GameView : View {
         if (!(game!!.coinsInitialized))
             game?.initializeGoldcoins()
 
+        //if enemies are not initiazlied
         if (!(game!!.enemiesInitialized))
             game?.initializeEnemy()
 
@@ -58,6 +58,7 @@ class GameView : View {
         canvas.drawBitmap(game!!.pacBitmap, game?.pacx!!.toFloat(),
                 game?.pacy!!.toFloat(), paint)
 
+        //draw the enemy
         canvas.drawBitmap(game!!.enemyBitmap, game?.enemyx!!.toFloat(),
                 game?.enemyy!!.toFloat(), paint)
 
@@ -70,8 +71,6 @@ class GameView : View {
                 canvas.drawBitmap(game!!.golBitmap, coin?.golx.toFloat(), coin?.goly.toFloat(), paint)
             }
         }
-
-
         game?.doCollisionCheck()
         super.onDraw(canvas)
     }

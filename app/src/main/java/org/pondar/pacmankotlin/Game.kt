@@ -30,7 +30,7 @@ open class Game(private var context: Context, view: TextView) {
     var direction = 0
     var directionEnemy = 1
     var counter: Int = 0
-    var timer: Int = 60
+    var timer: Int = 30
     var running: Boolean = false
 
     var coinsInitialized = false  //did we initialize the coins?
@@ -62,19 +62,15 @@ open class Game(private var context: Context, view: TextView) {
     fun initializeEnemy() {
         enemies.add(Enemy(false, true, 900, 900))
         enemiesInitialized = true
-        //genbrug timer fra pacman og gost (genbrug)
-        //direction - bevæg gost
-        //op ned højre venstre
-        // læg den i samme timer
-        //langsommere flytter mindre antal pixels
     }
 
     //initialize the arrylist of goldcoins and add coins
     fun initializeGoldcoins() {
+        coins.clear()
         coins.add(GoldCoin(false, 10, 10))
         coins.add(GoldCoin(false, 10, 900))
         coins.add(GoldCoin(false, 10, 1400))
-        coins.add(GoldCoin(false, 450, 10))
+        coins.add(GoldCoin(false, 900, 900))
         coins.add(GoldCoin(false, 450, 450))
         coins.add(GoldCoin(false, 450, 900))
         coins.add(GoldCoin(false, 450, 1400))
@@ -86,19 +82,20 @@ open class Game(private var context: Context, view: TextView) {
 
 
     fun newGame() {
-        running = false
         pacx = 50 //starting coordinates
         pacy = 400 //starting coordinates
         timer = 30
-      //  counter = 0
+        counter = 0
+        running = false
         coinsInitialized = false
-        enemiesInitialized = false
         points = 0 //reset the points
+        // initializeGoldcoins() // to make sure coins are
         pointsView.text = "${context.resources.getString(R.string.points)} $points"
         gameView?.invalidate() //redraw screen
+
     }
 
-     fun gameOver() {
+    fun gameOver() {
         if (timer == 1) {
             timer = 0
             running = false
@@ -175,62 +172,53 @@ open class Game(private var context: Context, view: TextView) {
     }
 
 
+    fun distance(pacx: Int, pacy: Int, golx: Int, goly: Int): Double {
 
-fun distance(pacx: Int, pacy: Int, golx: Int, goly: Int): Double {
+        // calculate distance and return it
+        var cordinatation = (sqrt(((pacx - golx) * (pacx - golx) + (pacy - goly) * (pacy - goly)).toDouble()))
 
-    // calculate distance and return it
-    var cordinatation = (sqrt(((pacx - golx) * (pacx - golx) + (pacy - goly) * (pacy - goly)).toDouble()))
+        return cordinatation;
+    }
 
-    return cordinatation;
-}
+    fun distanceEnemy(pacx: Int, pacy: Int, enemyx: Int, enemyy: Int): Double {
 
-fun distanceEnemy(pacx: Int, pacy: Int, enemyx: Int, enemyy: Int): Double {
+        // calculate distance and return it
+        var cordinatation = (sqrt(((pacx - enemyx) * (pacx - enemyx) + (pacy - enemyy) * (pacy - enemyy)).toDouble()))
 
-    // calculate distance and return it
-    var cordinatation = (sqrt(((pacx - enemyx) * (pacx - enemyx) + (pacy - enemyy) * (pacy - enemyy)).toDouble()))
-
-    return cordinatation;
-}
+        return cordinatation;
+    }
 
 
-//TODO check if the pacman touches a gold coin
+    //TODO check if the pacman touches a gold coin
 //and if yes, then update the neccesseary data
 //for the gold coins and the points
 //so you need to go through the arraylist of goldcoins and
 //check each of them for a collision with the pacman
-fun doCollisionCheck() {
+    fun doCollisionCheck() {
 
-    enemies.forEach {
-        if (distanceEnemy(pacx, pacy, enemyx, enemyy) < 200) {
-            running = false
-            Toast.makeText(context, "You died", Toast.LENGTH_SHORT).show()
+        enemies.forEach {
+            if (distanceEnemy(pacx, pacy, enemyx, enemyy) < 180) {
+                running = false
+                Toast.makeText(context, "You died", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 
+        coins.forEach {
+            if (distance(pacx, pacy, it.golx, it.goly) < 200) {
+                if (it.taken == false) {
+                    points++
+                    it.taken = true
+                    pointsView.text = "${context.resources.getString(R.string.points)} $points"
 
-    coins.forEach {
-        if (distance(pacx, pacy, it.golx, it.goly) < 220) {
-            if (it.taken == false) {
-                it.taken = true
-                points++
-                pointsView.text = "${context.resources.getString(R.string.points)} $points"
+                    //check if all 10 goldcoins are collected = win
+                    if (points === 10) {
+                        running = false
+                        Toast.makeText(context, "You won the game", Toast.LENGTH_SHORT).show()
+                    }
 
-          /*
-            } else {
-                    points == 0
+                    Log.d("points", points.toString())
                 }
-
-           */
-
-                //check if all 10 goldcoins are collected = win
-                if (points === 10) {
-                    running = false
-                    Toast.makeText(context, "You won the game", Toast.LENGTH_SHORT).show()
-                }
-
-                Log.d("points", points.toString())
             }
         }
     }
-}
 }

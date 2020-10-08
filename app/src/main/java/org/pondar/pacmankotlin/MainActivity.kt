@@ -17,7 +17,6 @@ class MainActivity : AppCompatActivity() {
 
     private var myTimer: Timer = Timer()
     private var countDown: Timer = Timer()
-    private var counter: Int = 0
 
     //reference to the game class.
     private var game: Game? = null
@@ -53,17 +52,12 @@ class MainActivity : AppCompatActivity() {
             game!!.running = true
         }
         reset.setOnClickListener {
-            counter = 0
             game!!.newGame() //calling the newGame method
-            game!!.running = false
-            timer.text = getString(R.string.timer, counter)
-            timerLeft.text = getString(R.string.timeLeft, counter)
+            timer.text = getString(R.string.timer, game!!.counter)
+            timerLeft.text = getString(R.string.timeLeft, game!!.counter)
         }
 
-
-
         game!!.running = false //should game be running?
-
 
         fun timerMethod() {
             this.runOnUiThread(timerTick);
@@ -99,12 +93,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        //just to make sure if the app is killed, that we stop the timer.
         myTimer.cancel()
     }
 
     private val timerTickCountDown = Runnable {
         if (game!!.running) {
+        //just to make sure if the app is killed, that we stop the timer.
             game!!.timer--
             timerLeft.text = getString(R.string.timeLeft, game!!.timer)
             game!!.gameOver()
@@ -160,8 +154,8 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "New Game clicked", Toast.LENGTH_LONG).show()
             game?.newGame()
 
-            timer.text = getString(R.string.timer, counter)
-            timerLeft.text = getString(R.string.timeLeft, counter)
+            timer.text = getString(R.string.timer, game!!.counter)
+            timerLeft.text = getString(R.string.timeLeft, game!!.counter)
 
             return true
         }
